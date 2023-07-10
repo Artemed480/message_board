@@ -1,0 +1,18 @@
+{% extends '../default.html' %}
+
+
+{% block title %} Все объявления {% endblock title %}
+
+{% block content %}
+<div>
+    <h2>Создать объявление</h2>
+    <form method="POST" class="form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }}
+        {{ form.as_p }}
+        <input type="submit" value="Разместить объявление" id="form_button">
+    </form>
+</div>
+
+
+{% endblock content %}

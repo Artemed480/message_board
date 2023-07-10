@@ -1,0 +1,47 @@
+{% extends '../default.html' %}
+
+{% block title %}{{announce.title|truncatechars:40}}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div>
+        <h2 class="text-center">{{ announce.title }}</h2>
+        <div>{{ announce.content|safe }}</div>
+    </div>
+    <div class="font-weight-light small">Автор статьи: {{announce.author}}</div>
+    <div class="mb-5 font-weight-light small">Категория: {{announce.get_category}}</div>
+    {% if announce.get_accept_reply %}
+    <h4>Отклики:</h4>
+    {% for reply in announce.get_reply %}
+    <div>
+    {% if reply.accept %}
+        <div class="">{{ reply.content|truncatechars:100 }}</div>
+        <div class="d-flex col-10 pl-0 font-weight-light small mb-4">
+            <div class="mr-4">{{ reply.replier }}</div>
+            <div>{{ reply.pub_date }}</div>
+        </div>
+    {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center  font-italic w-100">Пока откликов нет</div>
+{% endif %}
+    {% if not announce.author == user %}
+        <div>
+            <form action="{% url 'announces:reply_to_announce' announce.id %}" method="post">
+            {% csrf_token %}
+            <label for="content">Ваш отклик: </label>
+            <input id="content" type="text" name="content" required>
+            <input type="submit" value="Отправить отклик">
+            </form>
+        </div>
+    {% else %}
+        <div>
+            <h3>Это ваше объявление</h3>
+            <a href="{% url 'announces:announce_edit' announce.id %}">Внести изменения</a>
+            <a href="{% url 'announces:announce_delete' announce.id %}">Удалить объявление</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock content %}

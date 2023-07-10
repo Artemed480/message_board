@@ -1,0 +1,90 @@
+{% extends '../default.html' %}
+
+{% load static %}
+
+{% block title %} Все объявления {% endblock title %}
+
+{% block content %}
+    <div id="AnnounceBoard">
+        <h2 class="text-center">Все объявления</h2>
+        <div class="d-flex flex-wrap justify-content-around">      
+            <div class="card mb-3 col-10 col-md-5 pb-4"
+            v-for="announce in announces"
+            :id="'announces/'+[[announce.id]]"
+            v-on:click="route_announce([[announce.id]])"
+            v-bind:key="announce.id"
+        >
+            <h3 class="text-center">[[announce.title]]</h3>
+            <p v-html="announce.content" class="mb-1"></p>
+            <div class="d-flex">
+                <div class="font-weight-light small mr-5">Автор статьи: [[announce.author.username]]</div>
+                <div class="font-weight-light small">Дата публикации: [[announce.pub_date]]</div>
+            </div>
+            <div class="font-weight-light small mb-5">Категория: [[announce.get_category]]</div>
+
+
+        </div>
+    </div>
+{% endblock content %}
+
+{% block script %}
+<script src="https:/unpkg.com/vue@next"></script>
+<script>
+    const AnnounceBoard = {
+        data() {
+            return {
+                announces: [],
+                currentPage: 1,
+                hasNext: true
+            }
+        },
+        delimiters: ['[[', ']]'],
+        mounted() {
+            this.getAnnounces()
+
+            window.onscroll = () => {
+                const height = document.body.offsetHeight //Высота документа
+                const screenHeight = window.innerHeight //Высота экрана
+
+                const scrolled = window.scrollY // сколько проскролил       
+
+                const threshold = height - screenHeight / 10
+
+                const position = scrolled + screenHeight
+
+                if ((position >= threshold) && this.hasNext) {
+                    this.currentPage += 1
+                    this.hasNext = false
+                    this.getAnnounces()
+                }
+            }
+        },
+        methods: {
+            getAnnounces() {
+                fetch(`{% url 'announces:get_announces' %}?page=${this.currentPage}`)
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then(data => {
+                        if (data.next) {
+                            this.hasNext = true
+                        }
+                        
+                        for (let i = 0; i < data.results.length; i++){
+                            this.announces.push(data.results[i])
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            },
+            route_announce: function(id){
+                window.location.href="/announces/"+id
+            }
+        }
+    }
+
+    Vue.createApp(AnnounceBoard).mount('#AnnounceBoard')
+</script>
+<script type="text/javascript" src="{% static 'js/announces.js' %}"></script>
+{% endblock script %}

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Еженедельная рассылка</title>
+</head>
+<body>
+    <h2>Дорогие игроки</h2>
+    <p>Уведомляем вас о выходе новых объявлений за эту неделю</p>
+    {% for announce in announces %}
+        <p>{{ announce.author.username }} опубликовал объявление <a href="http://127.0.0.1:8000{% url 'announces:announce_detail' announce.id %}">{{ announce.title }}</a></p>
+    {% endfor %}
+</body>
+</html>

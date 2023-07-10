@@ -1,0 +1,43 @@
+{% extends '../default.html' %}
+
+{% load static %}
+
+{% block title %} Все объявления {% endblock title %}
+
+{% block content %}
+<div>
+    <h2 class="text-center">Все объявления</h2>
+    <div class="d-flex flex-wrap justify-content-around">
+    {% for announce in announces %}
+    <div class="card mb-3 col-10 col-md-5 pb-4" id="{% url 'announces:announce_detail' announce.id %}">
+        <h3 class="text-center">{{ announce.title }}</h3>
+        <p class="mb-1">{{ announce.content|truncatewords:140|safe }}</p>
+        <div class="d-flex">
+            <div class="font-weight-light small mr-5">Автор статьи: {{announce.author}}</div>
+            <div class="font-weight-light small">Дата публикации: {{ announce.pub_date }}</div>
+        </div>
+        <div class="font-weight-light small mb-5">Категория: {{announce.get_category}}</div>
+        {% if announce.get_accept_reply %}
+            <h4>Отклики:</h4>
+            {% for reply in announce.get_reply %}
+            <div>
+            {% if reply.accept %}
+                <div class="">{{ reply.content|truncatechars:100 }}</div>
+                <div class="d-flex col-10 pl-0 font-weight-light small mb-4">
+                    <div class="mr-4">{{ reply.replier }}</div>
+                    <div>{{ reply.pub_date }}</div>
+                </div>
+            {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center  font-italic w-100">Пока откликов нет</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+{% block script %}
+<script type="text/javascript" src="{% static 'js/announces.js' %}"></script>
+{% endblock script %}

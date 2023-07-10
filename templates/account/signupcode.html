@@ -1,0 +1,20 @@
+{% extends '../default.html' %}
+
+{% block title %} Все объявления {% endblock title %}
+
+{% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<h2> Введите код для пользователя {{ user.username }} </h2>
+<form method="post">
+{% csrf_token %}
+<input type="text" name="user" value="{{ user.id }}" readonly>
+{{ form.code }}
+<input type="submit" value="Продолжить">
+</form>
+{% endblock content %}

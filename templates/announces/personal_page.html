@@ -1,0 +1,83 @@
+{% extends '../default.html' %}
+
+{% block title %} Личный кабинет {% endblock title %}
+
+{% block content %}
+<h2>Моя личная страница</h2>
+<!-- Информация о пользователе -->
+<div id="user_information">
+    <div>Имя пользователя: {{ user }}</div>
+    <div><a href="{% url 'account:logout' %}">Выйти из системы</a></div>
+</div>
+<!-- Отклики на объявления пользователя -->
+<div id="user_replies">
+    {% if undefined_replies.count %}
+    <p>У вас {{ undefined_replies.count }} непринятых откликов</p>
+    <div>
+        <a href="{% url 'announces:personal_replies' %}?accept=false">Просмотреть непринятые отклики</a>
+    </div>
+    {% else %}
+    <p>Новых откликов нет</p>
+    <div>
+        <a href="{% url 'announces:personal_replies' %}">Просмотреть отклики на ваши объявления</a>
+    </div>
+    {% endif %}
+</div>
+<!-- Объявления пользователя -->
+<div id="user_annnounces">
+    {% if announces %}
+    <h3 class="text-center">Твои объявления:</h3>
+    {% else %}
+    <h3 class="text-center">У вас пока нет объявлений</h3>
+    {% endif %}
+    <div>
+        {% for announce in announces %}
+        <div class="card text-center mb-4 mx-auto pt-2 pb-5" style="width: 40rem;">
+            <h4 class="card-title">{{ announce.title }}</h4>
+            <div class="card-text mb-5">{{ announce.content|truncatewords:170|safe }}</div>
+            
+            <button type="button" class="btn btn-primary col-4 mx-auto" data-toggle="modal" data-target=".{{ announce.id }}">Раскрыть объявление</button>
+
+            <div class="modal fade {{ announce.id }}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <h4 class="card-title">{{ announce.title }}</h4>
+                        <div class="card-text mb-5">{{ announce.content|safe }}</div>
+                        <div class="d-flex justify-content-around mb-5">
+                            <a class="card-link" href="{% url 'announces:announce_edit' announce.id %}">Внести изменения</a>
+                            <a class="card-link" href="{% url 'announces:announce_delete' announce.id %}">Удалить объявление</a>
+                        </div>
+                        <h5 class="text-left">Отклики на данное объявление:</h5>
+
+                        {% if announce.get_reply %}
+                            {% for reply in announce.get_reply %}
+                                {% if reply.announce == announce %}
+                                <div>
+                                    <div class="mb-3 text-left">{{ reply.content|safe }}</div>
+                                    <div class="d-flex col-10 pl-0 font-weight-light small">
+                                        <div>{{ reply.replier }}, </div>
+                                        <div>{{ reply.pub_date }}</div>
+                                    </div>
+                                    <div class="d-flex">
+                                        {% if reply.accept %}
+                                        <div>Отклик принят</div>
+                                        {% else %}
+                                        <div><a href="{% url 'announces:reply_accept' reply.id %}">Принять отклик</a></div>
+                                        {% endif %}
+                                        <div class="ml-5"><a href="{% url 'announces:reply_delete' reply.id %}">Отклонить отклик</a></div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        <p>На это объявление пока нет откликов</p>
+                        {% endif %}
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %} 
+    </div>
+</div>
+{% endblock content %}

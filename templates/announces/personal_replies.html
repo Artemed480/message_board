@@ -1,0 +1,50 @@
+{% extends '../default.html' %}
+
+{% load static %}
+
+{% block title %} Отклики на ваши объявления {% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/personal_replies.css' %}">
+{% endblock head %}
+{% block content %}
+
+<form method="GET">
+    <label for="id_announce">Объявление</label>
+    {{filter.form.announce}}
+    <label for="id_accept">Решение по отклику</label>
+    <select name="accept" id="id_accept">
+        <option value="unknown">--------</option>
+      
+        <option value="true">Принятые</option>
+      
+        <option value="false">Непринятые</option>
+      
+      </select>
+    <input type="submit" value="Найти">
+</form>
+
+<h2 class="text-center">Отклики на ваши объявления</h2>
+
+<div class="d-flex flex-wrap justify-content-around col-8 mx-auto">
+  {% for reply in filter.qs %}
+  <div class="card col-5 mx-5 mb-5">
+    <div class="card-body">
+      <div class="card-text">
+        <p class="replier">{{ reply.replier }} оставил отклик:</p>
+        <p class="reply_content">"{{ reply.content }}"</p>
+        <p class="announce_title">на ваше объявление <u><a href="{% url 'announces:announce_detail' reply.announce.id %}">{{ reply.announce.title }}</a></u></p>
+      </div>
+      <div class="decision d-flex justify-content-between">
+        {% if reply.accept %}
+        <div>Отклик принят</div>
+        {% else %}
+        <div><a href="{% url 'announces:reply_accept' reply.id %}">Принять отклик</a></div>
+        {% endif %}
+        <div><a href="">Отклонить отклик</a></div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock content %}
